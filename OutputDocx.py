@@ -250,7 +250,7 @@ def OutputDocx(info, address, isNeedML):
     table_info.cell(0, 1).paragraphs[0].add_run(u'生成时间：%s'%time.strftime('%Y-%m-%d %H:%M',time.localtime(time.time())))
     table_info.cell(0, 1).paragraphs[0].paragraph_format.space_before = Pt(6)
     table_info.cell(0, 1).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-    table_info.cell(0, 1).paragraphs[0].paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
 
 
 
@@ -327,21 +327,65 @@ class printer:
         # 为标题应用样式
         tit.style = title_style
 
+
+        #表题信息栏
+        row1 = doc.add_paragraph('合同号:              送检单位：晨光东螺             要求完成时间：              送检时间：               编号：              ')
+        # 新设置一种名为"row1_style"的新style,设置字体大小，字体样式
+        row1_style = doc.styles.add_style('UserStyle3', WD_STYLE_TYPE.PARAGRAPH)
+        row1_style.font.size = Pt(10)
+        row1_style.font.name = u'宋体'
+        row1_style._element.rPr.rFonts.set(qn('w:eastAsia'), u'宋体')
+        tit.paragraph_format.alignment = WD_TABLE_ALIGNMENT.CENTER
+        row1.paragraph_format.space_after = Pt(0)
+        row1.paragraph_format.line_spacing_rule = WD_LINE_SPACING.SINGLE
+        # 为标题应用样式
+        row1.style = row1_style
+
+
+        #表格分为3个大部分（1.样品信息栏  2.试验项目栏  3.试验方法栏）
         # title_list = [r'序号', r'产品代号', r'零件名称', r'材料', u'厚度', u'下料净尺寸(mm)', u'数量', r'备注']
+        #1.样品信息栏
+        #table1_style 黑体 12号
+        table1_style = doc.styles.add_style('UserStyle4', WD_STYLE_TYPE.CHARACTER)
+        table1_style.font.size = Pt(10)
+        # table1_style.font.bold = True
+        table1_style.font.name = u'黑体'
+        table1_style._element.rPr.rFonts.set(qn('w:eastAsia'), u'黑体')
 
-        trow = 10
-        tcol = len(self.req)
-        table = doc.add_table(rows=trow, cols=tcol, style='Table Grid')
+        #table2_style  宋体 14号
+        table2_style = doc.styles.add_style('UserStyle5', WD_STYLE_TYPE.CHARACTER)
+        table2_style.font.size = Pt(12)
+        table2_style.font.name = u'宋体'
+        table2_style._element.rPr.rFonts.set(qn('w:eastAsia'), u'宋体')
 
+        # trow = 5
+        # tcol = 5
+        table1 = doc.add_table(rows=5, cols=7, style='Table Grid')
 
+        #第一行内容
+        table1.cell(0, 0).merge(table1.cell(0, 6))  # 合并第一行
         # doc.save(addr + '\\' + table_title + u'_结构件下料清单.docx')
+        run = table1.cell(0, 0).paragraphs[0].add_run('试料/试件制作过程记录卡')
+        table1.cell(0, 0).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        table1.cell(0, 0).paragraphs[0].paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run.style = table1_style
+        table1_list = [r'检验编号', r'试料/试件数量', r'试料/试件规格', r'材料牌号', u'材料炉批号', u'送检试样编号', u'试验项目']
 
-        doc.save(self.addrees+ '\\' + '_理化试验委托单1.docx')
+
+        for i in range(len(table1_list)):
+            table1.cell(1, i).paragraphs[0].add_run(table1_list[i]).style = table2_style
+            table1.cell(1, i).paragraphs[0].paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table1.cell(1, i).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+
+
+
+
+        doc.save(self.addrees+ '\\' + '_理化试验委托单2.docx')
         table_finish = '文件已生成'
 
 if __name__ == '__main__':
     from demo1 import *
     # print(Z2CN18_10['chemical']['ele'])
-    i = printer(Z2CN18_10,'C:/Users/wangyuan/PycharmProjects/Reinspection')
-    print(i.max_len())
+    i = printer(Z2CN18_10,'C:/Users/王元和邵宝宝/PycharmProjects/Reinspection')
+    i.print()
     # OutputDocx(info, 'C:\Users\wangyuan\PycharmProjects\Reinspection' + addr, True)
